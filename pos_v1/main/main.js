@@ -10,7 +10,7 @@ let buildCartItems = (inputs)=> {
 
     let cartItem = cartItems.find((cartItem)=>cartItem.item.barcode === barcode);
     if (cartItem) {
-      cartItem.count +=count;
+      cartItem.count += count;
     }
     else {
       let item = allItems.find((item)=> item.barcode === barcode);
@@ -20,3 +20,33 @@ let buildCartItems = (inputs)=> {
   }
   return cartItems;
 }
+
+
+let buildItemsSubtotal = (cartItems)=> {
+  return cartItems.map(cartItem=> {
+    let promotionType = getPromotionType(cartItem);
+    let {subtotal, saved} = discount(cartItem, promotionType);
+    return {cartItem, subtotal, saved};
+  })
+}
+
+let getPromotionType = (cartItem)=> {
+  let promotions = loadPromotions();
+  let promotion = promotions.find((promotion)=>promotion.barcodes.includes(cartItem.item.barcode));
+
+  return promotion ? promotion.type : " ";
+}
+
+let discount = (cartItem, promotionType)=> {
+  let freeItemCount = 0;
+
+  if (promotionType === 'BUY_TWO_GET_ONE_FREE') {
+    freeItemCount = parseInt(cartItem.count / 3);
+  }
+  let saved = cartItem.item.price * freeItemCount;
+  let subtotal = cartItem.item.price * (cartItem.count - freeItemCount);
+
+  return {subtotal, saved};
+}
+
+

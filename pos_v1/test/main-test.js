@@ -2,7 +2,7 @@
 
 describe('pos', () => {
   let inputs;
-let cartItems;
+  let cartItems;
   beforeEach(() => {
     inputs = [
       'ITEM000001',
@@ -99,37 +99,46 @@ let cartItems;
     expect(buildCartItems(inputs)).toEqual(expectText);
   });
 
-  it('buildItemsSubtotal',()=>{
+  it('buildItemsSubtotal', ()=> {
     let expectText = [
       {
-        item: {
-          barcode: 'ITEM000001',
-          name: '雪碧',
-          unit: '瓶',
-          price: 3.00
+        cartItem: {
+          item: {
+            barcode: 'ITEM000001',
+            name: '雪碧',
+            unit: '瓶',
+            price: 3.00
+          },
+          count: 5
         },
-        count: 5,
-        subtotal:12.00
+        subtotal: 12.00,
+        saved: 3.00
       },
       {
-        item: {
-          barcode: 'ITEM000003',
-          name: '荔枝',
-          unit: '斤',
-          price: 15.00
+        cartItem: {
+          item: {
+            barcode: 'ITEM000003',
+            name: '荔枝',
+            unit: '斤',
+            price: 15.00
+          },
+          count: 2
         },
-        count: 2,
-        subtotal:30
+        subtotal: 30,
+        saved: 0.00
       },
       {
-        item: {
-          barcode: 'ITEM000005',
-          name: '方便面',
-          unit: '袋',
-          price: 4.50
+        cartItem: {
+          item: {
+            barcode: 'ITEM000005',
+            name: '方便面',
+            unit: '袋',
+            price: 4.50
+          },
+          count: 3
         },
-        count: 3,
-        subtotal:9
+        subtotal: 9,
+        saved: 4.5
       }
     ]
     expect(buildItemsSubtotal(cartItems)).toEqual(expectText);
