@@ -1,9 +1,15 @@
 'use strict';
+let printReceipt = (inputs)=>{
+  let cartItems = buildCartItems(inputs);
+  let itemsSubtotal = buildItemsSubtotal(cartItems);
+  let receipt = buildReceipt(itemsSubtotal);
+  printCartItemsReceipt(receipt);
+}
 let buildCartItems = (inputs)=> {
   let cartItems = [];
   let allItems = loadAllItems();
 
-  for (let input  of inputs) {
+  for (let input of inputs) {
     let splitInput = input.split("-");
     let barcode = splitInput[0];
     let count = parseFloat(splitInput[1] || 1);
@@ -22,31 +28,52 @@ let buildCartItems = (inputs)=> {
 }
 
 
-let buildItemsSubtotal = (cartItems)=> {
-  return cartItems.map(cartItem=> {
+let buildItemsSubtotal = (cartItems)=>{
+  return cartItems.map(cartItem=>{
     let promotionType = getPromotionType(cartItem);
-    let {subtotal, saved} = discount(cartItem, promotionType);
-    return {cartItem, subtotal, saved};
+    let {saved,subtotal} = discount(promotionType,cartItem);
+
+    return {cartItem,saved,subtotal};
   })
 }
 
-let getPromotionType = (cartItem)=> {
+let getPromotionType = (cartItem)=>{
   let promotions = loadPromotions();
   let promotion = promotions.find((promotion)=>promotion.barcodes.includes(cartItem.item.barcode));
 
-  return promotion ? promotion.type : " ";
+  return promotion?promotion.type:' ';
 }
 
-let discount = (cartItem, promotionType)=> {
+let discount = (promotioType,cartItem)=>{
   let freeItemCount = 0;
-
-  if (promotionType === 'BUY_TWO_GET_ONE_FREE') {
-    freeItemCount = parseInt(cartItem.count / 3);
+  if(promotioType === "BUY_TWO_GET_ONE_FREE"){
+    freeItemCount = parseInt(cartItem.count/3);
   }
-  let saved = cartItem.item.price * freeItemCount;
-  let subtotal = cartItem.item.price * (cartItem.count - freeItemCount);
 
-  return {subtotal, saved};
+  let saved = cartItem.item.price * freeItemCount;
+  let subtotal = cartItem.item.price*(cartItem.count -freeItemCount);
+
+  return {saved,subtotal};
 }
 
+let buildReceipt= (itemsSubtotal)=>{
+  let total = 0;
+  let savedTotal = 0;
 
+  for(let itemSubtotal of itemsSubtotal){
+    total+=itemSubtotal.subtotal;
+    savedTotal+=itemSubtotal.saved;
+  }
+
+  return {itemsSubtotal,savedTotal,total};
+}
+
+let printCartItemsReceipt= (receipt)=>{
+  let receiptString = "***<没钱赚商店>收据***";
+  let itemsArray = receipt.itemsSubtotal;
+  for(let itemArray of itemsArray){
+    receiptString+='\n名称：'+itemArray.cartItem.item.name+'，数量：'+itemArray.cartItem.count+itemArray.cartItem.item.unit+'，单价：'+itemArray.cartItem.item.price.toFixed(2)+'(元)，小计：'+itemArray.subtotal.toFixed(2)+'(元)';
+  }
+  receiptString+='\n----------------------'+'\n总计：'+receipt.total.toFixed(2)+'(元)'+'\n节省：'+receipt.savedTotal.toFixed(2)+'(元)'+'\n**********************';
+  console.log(receiptString);
+}

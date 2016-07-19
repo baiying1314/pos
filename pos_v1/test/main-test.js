@@ -3,6 +3,7 @@
 describe('pos', () => {
   let inputs;
   let cartItems;
+  let itemsSubtotal;
   beforeEach(() => {
     inputs = [
       'ITEM000001',
@@ -15,36 +16,6 @@ describe('pos', () => {
       'ITEM000005',
       'ITEM000005'
     ];
-    cartItems = [
-      {
-        item: {
-          barcode: 'ITEM000001',
-          name: '雪碧',
-          unit: '瓶',
-          price: 3.00
-        },
-        count: 5
-      },
-      {
-        item: {
-          barcode: 'ITEM000003',
-          name: '荔枝',
-          unit: '斤',
-          price: 15.00
-        },
-        count: 2
-      },
-      {
-        item: {
-          barcode: 'ITEM000005',
-          name: '方便面',
-          unit: '袋',
-          price: 4.50
-        },
-        count: 3
-      }
-    ]
-
   });
 
   it('should print correct text', () => {
@@ -100,6 +71,7 @@ describe('pos', () => {
   });
 
   it('buildItemsSubtotal', ()=> {
+    cartItems = buildCartItems(inputs);
     let expectText = [
       {
         cartItem: {
@@ -142,5 +114,56 @@ describe('pos', () => {
       }
     ]
     expect(buildItemsSubtotal(cartItems)).toEqual(expectText);
+  });
+
+
+  it('buildReceipt', ()=> {
+    itemsSubtotal = buildItemsSubtotal(cartItems);
+    let expectText = {
+      itemsSubtotal: [
+        {
+          cartItem: {
+            item: {
+              barcode: 'ITEM000001',
+              name: '雪碧',
+              unit: '瓶',
+              price: 3.00
+            },
+            count: 5
+          },
+          subtotal: 12.00,
+          saved: 3.00
+        },
+        {
+          cartItem: {
+            item: {
+              barcode: 'ITEM000003',
+              name: '荔枝',
+              unit: '斤',
+              price: 15.00
+            },
+            count: 2
+          },
+          subtotal: 30,
+          saved: 0.00
+        },
+        {
+          cartItem: {
+            item: {
+              barcode: 'ITEM000005',
+              name: '方便面',
+              unit: '袋',
+              price: 4.50
+            },
+            count: 3
+          },
+          subtotal: 9,
+          saved: 4.5
+        }
+      ],
+      total: 51.00,
+      savedTotal: 7.50
+    }
+    expect(buildReceipt(itemsSubtotal)).toEqual(expectText);
   })
 });
