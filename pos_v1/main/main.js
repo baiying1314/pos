@@ -18,5 +18,5 @@ let buildCartItems = (inputs)=> {
       cartItems.push({item: item, count: count});
     }
   }
-  return;
+  return cartItems;
 }
